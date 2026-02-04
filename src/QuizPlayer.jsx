@@ -52,7 +52,7 @@ const QuizPlayer = ({ quizData }) => {
         
         <button 
           type="button"
-          onPointerDown={() => window.location.reload()} 
+          onClick={() => window.location.reload()} 
           className="bg-black text-white px-8 py-4 rounded-full font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer"
         >
           Zkusit znovu
@@ -64,11 +64,9 @@ const QuizPlayer = ({ quizData }) => {
             </h2>
 
             <div className="flex flex-row justify-center gap-3 mb-6 items-center">
-              {/* AKTUALIZOVANÝ ANDROID LINK */}
               <a href="https://play.google.com/store/apps/details?id=cz.kinobox.kinobox" target="_blank" rel="noreferrer" className="active:opacity-70 transition-opacity">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" className="h-10" />
               </a>
-              {/* AKTUALIZOVANÝ iOS LINK */}
               <a href="https://apps.apple.com/cz/app/kinobox-filmov%C3%A1-datab%C3%A1ze/id6464039616" target="_blank" rel="noreferrer" className="active:opacity-70 transition-opacity">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="App Store" className="h-10" />
               </a>
@@ -93,7 +91,7 @@ const QuizPlayer = ({ quizData }) => {
   if (!q) return <div className="p-10 text-center text-black font-bold">Načítání otázek...</div>;
 
   return (
-    <div className="max-w-xl mx-auto bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 touch-manipulation">
+    <div className="max-w-xl mx-auto bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
       <div className="bg-gray-100 h-2 w-full">
         <div 
           className="bg-blue-600 h-full transition-all duration-700 ease-out" 
@@ -106,7 +104,7 @@ const QuizPlayer = ({ quizData }) => {
           {currentStep > 0 ? (
             <button 
               type="button"
-              onPointerDown={handleBack}
+              onClick={handleBack}
               className="flex items-center gap-1 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-black active:text-blue-600 transition-colors cursor-pointer"
             >
               <ChevronLeft size={14} /> Zpět
@@ -134,10 +132,8 @@ const QuizPlayer = ({ quizData }) => {
             <button
               key={idx}
               type="button"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                handleAnswer(ans.isCorrect);
-              }}
+              // OPRAVA: Změna zpět na onClick pro odlišení tapu od scrollu
+              onClick={() => handleAnswer(ans.isCorrect)}
               className="group flex items-center p-5 bg-gray-50 border-2 border-gray-100 rounded-2xl text-left hover:border-blue-500 active:border-blue-600 active:bg-blue-50 active:scale-[0.98] transition-all duration-100 cursor-pointer overflow-hidden"
             >
               <span className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center font-bold text-xs mr-4 group-hover:bg-blue-600 group-hover:text-white group-active:bg-blue-700 transition-colors text-black pointer-events-none">
