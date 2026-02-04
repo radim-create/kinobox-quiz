@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import ImageUploader from './ImageUploader';
 import QuizPlayer from './QuizPlayer';
-import { PlusCircle, Trash2, CheckCircle2, Layout, Save, Award, Percent } from 'lucide-react';
+import { PlusCircle, Trash2, CheckCircle2, Layout, Save, Award } from 'lucide-react';
 
 function App() {
   const [view, setView] = useState('list'); 
@@ -60,7 +60,6 @@ function App() {
     setLoading(false);
   };
 
-  // --- LOGIKA PRO OTÁZKY ---
   const addQuestion = () => {
     setQuestions([...questions, { text: '', image: '', answers: [{ text: '', isCorrect: false }] }]);
   };
@@ -92,7 +91,6 @@ function App() {
     setQuestions(newQs);
   };
 
-  // --- LOGIKA PRO VÝSLEDKY ---
   const addResult = () => {
     setResults([...results, { min: 0, max: 100, title: '', text: '' }]);
   };
@@ -154,7 +152,16 @@ function App() {
                   <h3 className="font-bold text-lg mb-6 line-clamp-2 min-h-[3.5rem] group-hover:text-blue-600 transition-colors">{quiz.title}</h3>
                   <div className="flex gap-2">
                     <button onClick={() => editQuiz(quiz)} className="flex-1 bg-slate-900 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-blue-600 transition-all">Upravit</button>
-                    <button onClick={() => { const prodUrl = 'https://kinobox-quiz-lake.vercel.app'; const embed = `<iframe src="${prodUrl}/play/${quiz.id}" style="width:100%; border:none; min-height:800px; overflow:hidden;" scrolling="no"></iframe>`; navigator.clipboard.writeText(embed); alert('Embed kód zkopírován!'); }} className="bg-slate-100 text-slate-500 px-4 py-3 rounded-xl text-xs font-bold uppercase hover:bg-slate-200 transition-all">Embed</button>
+                    <button 
+                      onClick={() => { 
+                        const prodUrl = 'https://kinobox-quiz-lake.vercel.app'; 
+                        // OPRAVENO: Používá cestu /embed/, výšku 750px a bílé pozadí
+                        const embed = `<iframe src="${prodUrl}/embed/${quiz.id}" style="width:100%; height:750px; background-color:white;" frameborder="0" scrolling="no" loading="eager"></iframe>`; 
+                        navigator.clipboard.writeText(embed); 
+                        alert('Embed kód zkopírován!'); 
+                      }} 
+                      className="bg-slate-100 text-slate-500 px-4 py-3 rounded-xl text-xs font-bold uppercase hover:bg-slate-200 transition-all"
+                    >Embed</button>
                   </div>
                 </div>
               ))}
@@ -189,7 +196,6 @@ function App() {
               <button onClick={addQuestion} className="w-full py-6 border-2 border-dashed border-blue-200 rounded-3xl text-blue-600 font-black uppercase tracking-widest hover:bg-blue-50 transition-all">+ Přidat otázku</button>
             </div>
 
-            {/* --- NOVÁ SEKCE PRO VÝSLEDKY --- */}
             <div className="space-y-6 pt-10 border-t border-slate-200">
               <h3 className="text-xl font-black uppercase italic tracking-tight text-slate-400 flex items-center gap-2">
                 <Award size={20} /> Výsledná hodnocení
@@ -207,7 +213,7 @@ function App() {
                       <input type="number" value={res.max} onChange={e => updateResult(rIdx, 'max', e.target.value)} className="w-full bg-slate-50 border-none rounded-xl font-bold p-3" />
                     </div>
                   </div>
-                  <input value={res.title} onChange={e => updateResult(rIdx, 'title', e.target.value)} placeholder="Název hodnocení (např. Jsi filmový maniak!)" className="w-full text-xl font-bold border-none focus:ring-0 p-0 placeholder:text-slate-200" />
+                  <input value={res.title} onChange={e => updateResult(rIdx, 'title', e.target.value)} placeholder="Název hodnocení..." className="w-full text-xl font-bold border-none focus:ring-0 p-0 placeholder:text-slate-200" />
                   <textarea value={res.text} onChange={e => updateResult(rIdx, 'text', e.target.value)} placeholder="Podrobný text hodnocení..." className="w-full text-slate-600 border-none focus:ring-0 p-0 resize-none" rows="2" />
                 </div>
               ))}
