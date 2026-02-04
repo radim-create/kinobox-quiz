@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { ChevronLeft } from 'lucide-react';
+// PŘIDÁNY IMPORTY HVĚZD
+import { ChevronLeft, Star, StarHalf } from 'lucide-react';
 
 const QuizPlayer = ({ quizData }) => {
   const [currentStep, setCurrentStep] = useState(0); 
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
-  const [answersHistory, setAnswersHistory] = useState([]); // Sledujeme historii pro tlačítko zpět
+  const [answersHistory, setAnswersHistory] = useState([]);
 
   const questions = quizData.questions || [];
   const results = quizData.results || [];
 
   const handleAnswer = (isCorrect) => {
-    // Uložíme si, jestli byla odpověď správně, abychom ji mohli při "Zpět" odečíst
     setAnswersHistory([...answersHistory, isCorrect]);
     if (isCorrect) setScore(score + 1);
 
@@ -26,7 +26,7 @@ const QuizPlayer = ({ quizData }) => {
   const handleBack = () => {
     if (currentStep > 0) {
       const lastAnswerWasCorrect = answersHistory[answersHistory.length - 1];
-      if (lastAnswerWasCorrect) setScore(score - 1); // Odečteme bod, pokud byl připsán
+      if (lastAnswerWasCorrect) setScore(score - 1);
       
       const newHistory = [...answersHistory];
       newHistory.pop();
@@ -56,6 +56,38 @@ const QuizPlayer = ({ quizData }) => {
         >
           Zkusit znovu
         </button>
+
+        {/* --- ZDE JE NOVĚ PŘIDÁN ZMENŠENÝ BANNER --- */}
+        <div className="mt-12 pt-8 border-t border-gray-100">
+            <h2 className="text-lg md:text-xl font-black text-slate-900 mb-6 leading-tight max-w-md mx-auto">
+              Přidejte se k milovníkům filmů a seriálů a stáhněte si naši aplikaci
+            </h2>
+
+            <div className="flex flex-row justify-center gap-3 mb-6 items-center">
+              <a href="https://play.google.com/store/apps/details?id=cz.kinobox" target="_blank" rel="noreferrer">
+                {/* ZMENŠENO NA h-10 */}
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Nyní na Google Play" className="h-10" />
+              </a>
+              <a href="https://apps.apple.com/cz/app/kinobox/id1501170940" target="_blank" rel="noreferrer">
+                {/* ZMENŠENO NA h-10 */}
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Stáhnout v App Store" className="h-10" />
+              </a>
+            </div>
+
+            <div className="flex justify-center items-center gap-2 text-slate-600 font-bold text-sm">
+              <span>100 000+ stažení</span>
+              <div className="flex text-yellow-500">
+                {/* ZMENŠENO NA size={16} */}
+                <Star size={16} fill="currentColor" />
+                <Star size={16} fill="currentColor" />
+                <Star size={16} fill="currentColor" />
+                <Star size={16} fill="currentColor" />
+                <StarHalf size={16} fill="currentColor" />
+              </div>
+            </div>
+        </div>
+        {/* --- KONEC BANNERU --- */}
+
       </div>
     );
   }
@@ -65,7 +97,6 @@ const QuizPlayer = ({ quizData }) => {
 
   return (
     <div className="max-w-xl mx-auto bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
-      {/* Progress Bar */}
       <div className="bg-gray-100 h-2 w-full">
         <div 
           className="bg-blue-600 h-full transition-all duration-700 ease-out" 
@@ -74,7 +105,6 @@ const QuizPlayer = ({ quizData }) => {
       </div>
 
       <div className="p-6">
-        {/* Horní lišta s navigací */}
         <div className="flex justify-between items-center mb-8">
           {currentStep > 0 ? (
             <button 
@@ -84,14 +114,13 @@ const QuizPlayer = ({ quizData }) => {
               <ChevronLeft size={14} /> Zpět
             </button>
           ) : (
-            <div /> // Prázdné místo pro zarovnání
+            <div />
           )}
           <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
             Otázka {currentStep + 1} z {questions.length}
           </span>
         </div>
 
-        {/* Text otázky - Přidána výrazná barva a velikost */}
         <h2 className="text-2xl md:text-3xl font-bold mb-8 leading-tight text-slate-900 min-h-[4rem]">
           {q.text}
         </h2>
@@ -102,7 +131,6 @@ const QuizPlayer = ({ quizData }) => {
           </div>
         )}
 
-        {/* Odpovědi */}
         <div className="grid grid-cols-1 gap-3">
           {q.answers.map((ans, idx) => (
             <button
