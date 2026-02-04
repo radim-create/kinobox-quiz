@@ -42,7 +42,8 @@ const QuizPlayer = ({ quizData }) => {
   if (showResult) {
     const res = getFinalResult();
     return (
-      <div className="p-8 text-center bg-white rounded-3xl animate-in fade-in duration-500 max-w-xl mx-auto border border-gray-100 shadow-sm">
+      /* OPRAVA: Přidáno max-h-[740px] a overflow-y-auto pro scrollování výsledků v iFramu */
+      <div className="p-8 text-center bg-white rounded-3xl animate-in fade-in duration-500 max-w-xl mx-auto border border-gray-100 shadow-sm max-h-[740px] overflow-y-auto">
         <h2 className="text-4xl font-black mb-2 italic uppercase tracking-tighter text-black">DOKONČENO!</h2>
         <div className="inline-block bg-yellow-400 text-black font-black text-3xl px-6 py-2 rounded-2xl mb-6 shadow-sm">
           {score} / {questions.length}
@@ -121,7 +122,7 @@ const QuizPlayer = ({ quizData }) => {
   if (!q) return <div className="p-10 text-center text-black font-bold">Načítání otázek...</div>;
 
   return (
-    <div className="max-w-xl mx-auto bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
+    <div className="max-w-xl mx-auto bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 touch-manipulation">
       <div className="bg-gray-100 h-2 w-full">
         <div 
           className="bg-blue-600 h-full transition-all duration-700 ease-out" 
