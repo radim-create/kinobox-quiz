@@ -1,24 +1,23 @@
-/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Fix pro bílé pozadí v aplikaci */
 :root {
   background-color: #ffffff !important;
-  color: #000000 !important;
+  color-scheme: light !important;
 }
 
 html, body, #root {
   background-color: #ffffff !important;
-  color: #000000 !important;
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  color-scheme: light !important;
 }
 
-/* Zajištění, že texty v kvízu budou vždy vidět */
-.text-slate-900, .text-black {
-  color: #0f172a !important;
+/* Pojistka pro čitelnost textu v iOS WebView */
+body {
+  color: #000000 !important;
+  -webkit-font-smoothing: antialiased;
 }
