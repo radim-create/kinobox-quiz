@@ -52,7 +52,7 @@ const QuizPlayer = ({ quizData }) => {
         
         <button 
           type="button"
-          onClick={() => window.location.reload()} 
+          onPointerUp={() => window.location.reload()} 
           className="bg-black text-white px-8 py-4 rounded-full font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer"
         >
           Zkusit znovu
@@ -104,7 +104,7 @@ const QuizPlayer = ({ quizData }) => {
           {currentStep > 0 ? (
             <button 
               type="button"
-              onClick={handleBack}
+              onPointerUp={handleBack}
               className="flex items-center gap-1 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-black active:text-blue-600 transition-colors cursor-pointer"
             >
               <ChevronLeft size={14} /> Zpět
@@ -132,8 +132,11 @@ const QuizPlayer = ({ quizData }) => {
             <button
               key={idx}
               type="button"
-              // OPRAVA: Změna zpět na onClick pro odlišení tapu od scrollu
-              onClick={() => handleAnswer(ans.isCorrect)}
+              // OPRAVA: onPointerUp zareaguje až při zvednutí prstu, což nevadí scrollu
+              onPointerUp={(e) => {
+                e.preventDefault();
+                handleAnswer(ans.isCorrect);
+              }}
               className="group flex items-center p-5 bg-gray-50 border-2 border-gray-100 rounded-2xl text-left hover:border-blue-500 active:border-blue-600 active:bg-blue-50 active:scale-[0.98] transition-all duration-100 cursor-pointer overflow-hidden"
             >
               <span className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center font-bold text-xs mr-4 group-hover:bg-blue-600 group-hover:text-white group-active:bg-blue-700 transition-colors text-black pointer-events-none">
