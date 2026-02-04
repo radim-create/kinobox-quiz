@@ -2,21 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import ImageUploader from './ImageUploader';
 import QuizPlayer from './QuizPlayer';
-// PŘIDÁNA IKONKA Play
-import { PlusCircle, Trash2, CheckCircle2, Layout, Save, Award, Play } from 'lucide-react';
+import { PlusCircle, Trash2, CheckCircle2, Layout, Save, Award, Play, Lock, Loader2 } from 'lucide-react';
 
 function App() {
+  const [session, setSession] = useState(null);
   const [view, setView] = useState('list'); 
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [publicQuiz, setPublicQuiz] = useState(null);
   
+  // Stavy pro login
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState(null);
+
   const [currentQuizId, setCurrentQuizId] = useState(null);
   const [quizTitle, setQuizTitle] = useState('');
   const [questions, setQuestions] = useState([]);
   const [results, setResults] = useState([{ min: 0, max: 100, title: '', text: '' }]);
 
   useEffect(() => {
+    // Kontrola přihlášení
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
     const path = window.location.pathname;
     if (path.includes('/play/') || path.includes('/embed/')) {
       const parts = path.split('/');
@@ -27,13 +37,26 @@ function App() {
     }
   }, []);
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setAuthError(null);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setAuthError('Špatný email nebo heslo');
+    else setSession(data.session);
+    setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+  };
+
   const fetchPublicQuiz = async (id) => {
     const { data, error } = await supabase.from('quizzes').select('*').eq('id', id).single();
     if (data) {
       setPublicQuiz(data);
       setView('play');
-      
-      // LOGIKA POČÍTADLA: Přičte 1 při každém spuštění
       await supabase.from('quizzes').update({ plays: (data.plays || 0) + 1 }).eq('id', id);
     }
   };
@@ -48,79 +71,76 @@ function App() {
   const handleSave = async () => {
     if (!quizTitle || questions.length === 0) return alert('Doplňte název a otázky.');
     const quizData = { title: quizTitle, slug: quizTitle.toLowerCase().replace(/ /g, '-'), questions, results };
-    
     setLoading(true);
     const { error } = currentQuizId 
       ? await supabase.from('quizzes').update(quizData).eq('id', currentQuizId)
       : await supabase.from('quizzes').insert([quizData]);
 
-    if (error) {
-      alert('Chyba: ' + error.message);
-    } else {
-      alert('Kvíz byl úspěšně uložen!');
-      setView('list');
-      loadQuizzes();
-    }
+    if (error) alert('Chyba: ' + error.message);
+    else { alert('Kvíz byl úspěšně uložen!'); setView('list'); loadQuizzes(); }
     setLoading(false);
   };
 
-  const addQuestion = () => {
-    setQuestions([...questions, { text: '', image: '', answers: [{ text: '', isCorrect: false }] }]);
-  };
-  const updateQuestion = (index, field, value) => {
-    const newQs = [...questions];
-    newQs[index][field] = value;
-    setQuestions(newQs);
-  };
-  const removeQuestion = (index) => {
-    setQuestions(questions.filter((_, i) => i !== index));
-  };
-  const addAnswer = (qIdx) => {
-    const newQs = [...questions];
-    newQs[qIdx].answers.push({ text: '', isCorrect: false });
-    setQuestions(newQs);
-  };
+  // Helper funkce pro editor (beze změny)
+  const addQuestion = () => setQuestions([...questions, { text: '', image: '', answers: [{ text: '', isCorrect: false }] }]);
+  const updateQuestion = (index, field, value) => { const newQs = [...questions]; newQs[index][field] = value; setQuestions(newQs); };
+  const removeQuestion = (index) => setQuestions(questions.filter((_, i) => i !== index));
+  const addAnswer = (qIdx) => { const newQs = [...questions]; newQs[qIdx].answers.push({ text: '', isCorrect: false }); setQuestions(newQs); };
   const updateAnswer = (qIdx, aIdx, field, value) => {
     const newQs = [...questions];
-    if (field === 'isCorrect') {
-      newQs[qIdx].answers = newQs[qIdx].answers.map((a, i) => ({ ...a, isCorrect: i === aIdx }));
-    } else {
-      newQs[qIdx].answers[aIdx][field] = value;
-    }
+    if (field === 'isCorrect') newQs[qIdx].answers = newQs[qIdx].answers.map((a, i) => ({ ...a, isCorrect: i === aIdx }));
+    else newQs[qIdx].answers[aIdx][field] = value;
     setQuestions(newQs);
   };
-  const removeAnswer = (qIdx, aIdx) => {
-    const newQs = [...questions];
-    newQs[qIdx].answers = newQs[qIdx].answers.filter((_, i) => i !== aIdx);
-    setQuestions(newQs);
-  };
+  const removeAnswer = (qIdx, aIdx) => { const newQs = [...questions]; newQs[qIdx].answers = newQs[qIdx].answers.filter((_, i) => i !== aIdx); setQuestions(newQs); };
+  const addResult = () => setResults([...results, { min: 0, max: 100, title: '', text: '' }]);
+  const updateResult = (index, field, value) => { const newResults = [...results]; newResults[index][field] = (field === 'min' || field === 'max') ? parseInt(value) || 0 : value; setResults(newResults); };
+  const removeResult = (index) => setResults(results.filter((_, i) => i !== index));
 
-  const addResult = () => {
-    setResults([...results, { min: 0, max: 100, title: '', text: '' }]);
-  };
-  const updateResult = (index, field, value) => {
-    const newResults = [...results];
-    newResults[index][field] = (field === 'min' || field === 'max') ? parseInt(value) || 0 : value;
-    setResults(newResults);
-  };
-  const removeResult = (index) => {
-    setResults(results.filter((_, i) => i !== index));
-  };
-
+  // ZOBRAZENÍ KVÍZU (Vždy veřejné)
   if (view === 'play' && publicQuiz) {
+    return <div className="min-h-screen bg-white"><QuizPlayer quizData={publicQuiz} /></div>;
+  }
+
+  // PŘIHLAŠOVACÍ OBRAZOVKA (Pokud není session)
+  if (!session) {
     return (
-      <div className="min-h-screen bg-white">
-        <QuizPlayer quizData={publicQuiz} />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white p-10 rounded-[40px] shadow-xl border border-slate-100">
+          <div className="flex justify-center mb-6">
+            <div className="bg-blue-50 p-4 rounded-full text-blue-600"><Lock size={32} /></div>
+          </div>
+          <h2 className="text-3xl font-black text-center mb-2 tracking-tighter uppercase italic">Admin Vstup</h2>
+          <p className="text-center text-slate-400 text-sm mb-8 font-bold uppercase tracking-widest">Kinobox Quiz Builder</p>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input 
+              type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)}
+              className="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold focus:ring-2 focus:ring-blue-100 transition-all"
+            />
+            <input 
+              type="password" placeholder="Heslo" value={password} onChange={e => setPassword(e.target.value)}
+              className="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold focus:ring-2 focus:ring-blue-100 transition-all"
+            />
+            {authError && <p className="text-red-500 text-xs font-bold text-center">{authError}</p>}
+            <button 
+              type="submit" disabled={loading}
+              className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex justify-center"
+            >
+              {loading ? <Loader2 className="animate-spin" /> : 'Přihlásit se'}
+            </button>
+          </form>
+        </div>
       </div>
     );
   }
 
   const editQuiz = (quiz) => {
     setCurrentQuizId(quiz.id); setQuizTitle(quiz.title); setQuestions(quiz.questions);
-    setResults(quiz.results || [{ min: 0, max: 100, title: '', text: '' }]); 
-    setView('editor');
+    setResults(quiz.results || [{ min: 0, max: 100, title: '', text: '' }]); setView('editor');
   };
 
+  // BUILDER (Jen pro přihlášené)
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
       <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 p-4 shadow-sm">
@@ -134,8 +154,8 @@ function App() {
                 <Save size={18} /> {loading ? 'Ukládám...' : 'ULOŽIT'}
               </button>
             )}
-            <button onClick={() => setView('list')} className="bg-slate-100 text-slate-600 px-6 py-2 rounded-full text-sm font-bold hover:bg-slate-200 transition-all">
-              MOJE KVÍZY
+            <button onClick={handleLogout} className="bg-slate-100 text-slate-600 px-6 py-2 rounded-full text-sm font-bold hover:bg-slate-200 transition-all">
+              ODHLÁSIT
             </button>
           </div>
         </div>
@@ -153,14 +173,10 @@ function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {quizzes.map(quiz => (
                 <div key={quiz.id} className="bg-white border border-slate-100 p-5 rounded-3xl shadow-sm hover:shadow-md transition-all group">
-                  {/* UPRAVENO: Menší margin-bottom u titulku kvůli počítadlu */}
                   <h3 className="font-bold text-lg mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-blue-600 transition-colors">{quiz.title}</h3>
-                  
-                  {/* NOVÉ POČÍTADLO */}
                   <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-1.5">
                     <Play size={12} fill="currentColor" /> Spuštěno: {quiz.plays || 0}x
                   </div>
-
                   <div className="flex gap-2">
                     <button onClick={() => editQuiz(quiz)} className="flex-1 bg-slate-900 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-blue-600 transition-all">Upravit</button>
                     <button 
@@ -183,7 +199,7 @@ function App() {
               <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Název kvízu</label>
               <input value={quizTitle} onChange={e => setQuizTitle(e.target.value)} placeholder="Název kvízu..." className="w-full text-3xl font-bold bg-transparent border-none focus:ring-0 p-0 placeholder:text-slate-200" />
             </div>
-
+            {/* ... zbytek editoru (Otázky a Výsledky) zůstává stejný jako minule ... */}
             <div className="space-y-6">
               <h3 className="text-xl font-black uppercase italic tracking-tight text-slate-400">Otázky</h3>
               {questions.map((q, qIdx) => (
@@ -205,7 +221,6 @@ function App() {
               ))}
               <button onClick={addQuestion} className="w-full py-6 border-2 border-dashed border-blue-200 rounded-3xl text-blue-600 font-black uppercase tracking-widest hover:bg-blue-50 transition-all">+ Přidat otázku</button>
             </div>
-
             <div className="space-y-6 pt-10 border-t border-slate-200">
               <h3 className="text-xl font-black uppercase italic tracking-tight text-slate-400 flex items-center gap-2">
                 <Award size={20} /> Výsledná hodnocení
