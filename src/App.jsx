@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import ImageUploader from './ImageUploader';
 import QuizPlayer from './QuizPlayer';
-import { PlusCircle, Trash2, Save, Eye, Edit3, CheckCircle2, Code, ChevronLeft } from 'lucide-react';
+import { PlusCircle, Trash2, CheckCircle2 } from 'lucide-react';
 
 function App() {
-  const [view, setView] = useState('list'); // 'list', 'editor', 'preview', 'play'
+  const [view, setView] = useState('list');
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [publicQuiz, setPublicQuiz] = useState(null);
@@ -15,7 +15,6 @@ function App() {
   const [questions, setQuestions] = useState([]);
   const [results, setResults] = useState([{ min: 0, max: 100, title: '', text: '' }]);
 
-  // LOGIKA PRO VEŘEJNÉ ZOBRAZENÍ (/play/ID)
   useEffect(() => {
     const path = window.location.pathname;
     if (path.startsWith('/play/')) {
@@ -62,28 +61,19 @@ function App() {
     else { alert('Uloženo!'); setView('list'); loadQuizzes(); }
   };
 
-  // POKUD HRAJEME (VEŘEJNÁ STRÁNKA), ZOBRAZÍME JEN PLAYER
   if (view === 'play' && publicQuiz) {
     return (
-      <div className="min-h-screen bg-white p-4">
+      <div className="min-h-screen bg-white">
         <QuizPlayer quizData={publicQuiz} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white text-black font-sans selection:bg-yellow-200">
-      <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 p-3 shadow-sm">
+    <div className="min-h-screen bg-white text-black font-sans">
+      <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 p-3">
         <div className="max-w-5xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-6">
-            <h1 className="text-lg font-black tracking-tighter cursor-pointer" onClick={() => setView('list')}>KINOBOX BUILDER</h1>
-            {view !== 'list' && (
-              <div className="flex bg-gray-100 rounded-lg p-0.5 border border-gray-200">
-                <button onClick={() => setView('editor')} className={`px-4 py-1.5 rounded-md text-xs font-bold ${view === 'editor' ? 'bg-white shadow-sm' : 'text-gray-500'}`}>EDITOR</button>
-                <button onClick={() => setView('preview')} className={`px-4 py-1.5 rounded-md text-xs font-bold ${view === 'preview' ? 'bg-white shadow-sm' : 'text-gray-500'}`}>NÁHLED</button>
-              </div>
-            )}
-          </div>
+          <h1 className="text-lg font-black tracking-tighter cursor-pointer" onClick={() => setView('list')}>KINOBOX BUILDER</h1>
           <button onClick={handleSave} className="bg-black text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-yellow-400 hover:text-black transition-all">
             {view === 'list' ? 'MOJE KVÍZY' : 'ULOŽIT'}
           </button>
@@ -104,11 +94,14 @@ function App() {
                 <div key={quiz.id} className="border border-gray-200 p-4 rounded-xl hover:shadow-md transition-shadow">
                   <h3 className="font-bold mb-4 line-clamp-1">{quiz.title}</h3>
                   <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => editQuiz(quiz)} className="bg-gray-900 text-white py-2 rounded-lg text-xs font-bold uppercase hover:bg-black">Upravit</button>
+                    <button onClick={() => editQuiz(quiz)} className="bg-gray-900 text-white py-2 rounded-lg text-xs font-bold uppercase">Upravit</button>
                     <button 
                       onClick={() => {
-                        const embed = `<iframe src="${window.location.origin}/play/${quiz.id}" style="width:100%; border:none; min-height:500px;"></iframe>`;
-                        navigator.clipboard.writeText(embed); alert('Kód zkopírován!');
+                        // AUTOMATICKÉ GENEROVÁNÍ SPRÁVNÉ URL
+                        const baseUrl = window.location.origin;
+                        const embed = `<iframe src="${baseUrl}/play/${quiz.id}" style="width:100%; border:none; min-height:600px; overflow:hidden;" scrolling="no" allow="clipboard-write"></iframe>`;
+                        navigator.clipboard.writeText(embed); 
+                        alert('Kód s URL ' + baseUrl + ' byl zkopírován!');
                       }}
                       className="border border-gray-200 text-gray-500 py-2 rounded-lg text-xs font-bold uppercase hover:bg-gray-50"
                     >Embed</button>
@@ -119,7 +112,7 @@ function App() {
           </div>
         ) : view === 'editor' ? (
           <div className="space-y-6 max-w-4xl mx-auto">
-            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">NÁZEV KVÍZU</label>
               <input 
                 className="w-full bg-white border border-gray-200 p-3 rounded-xl text-xl font-bold outline-none focus:border-yellow-400"
@@ -132,7 +125,7 @@ function App() {
                 <div key={q.id} className="bg-white border border-gray-200 p-6 rounded-2xl relative shadow-sm">
                   <div className="flex justify-between items-center mb-4 border-b border-gray-50 pb-4">
                     <span className="font-black text-xs uppercase tracking-tighter">Otázka #{qIdx + 1}</span>
-                    <button onClick={() => setQuestions(questions.filter(item => item.id !== q.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={18}/></button>
+                    <button onClick={() => setQuestions(questions.filter(item => item.id !== q.id))} className="text-red-400 hover:text-red-600"><Trash2 size={18}/></button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
                     <div className="md:col-span-3">
@@ -162,29 +155,9 @@ function App() {
               ))}
             </div>
             
-            <button onClick={() => setQuestions([...questions, { id: Date.now(), text: '', answers: Array(4).fill(0).map(() => ({ id: Math.random(), text: '', isCorrect: false })) }])} className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 text-sm font-bold hover:border-yellow-400 hover:text-black hover:bg-gray-50 transition-all uppercase">
+            <button onClick={() => setQuestions([...questions, { id: Date.now(), text: '', answers: Array(4).fill(0).map(() => ({ id: Math.random(), text: '', isCorrect: false })) }])} className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 text-sm font-bold uppercase">
               + Přidat otázku
             </button>
-
-            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 mt-12">
-              <h3 className="text-sm font-black mb-4 uppercase">Vyhodnocení</h3>
-              <div className="space-y-3">
-                {results.map((res, idx) => (
-                  <div key={idx} className="bg-white p-4 rounded-xl border border-gray-200 grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="flex gap-2 items-center">
-                      <input type="number" className="w-full bg-gray-50 border border-gray-100 p-2 rounded text-center text-xs font-bold" value={res.min} onChange={(e) => { const n = [...results]; n[idx].min = e.target.value; setResults(n); }} />
-                      <span className="text-[10px]">-</span>
-                      <input type="number" className="w-full bg-gray-50 border border-gray-100 p-2 rounded text-center text-xs font-bold" value={res.max} onChange={(e) => { const n = [...results]; n[idx].max = e.target.value; setResults(n); }} />
-                    </div>
-                    <div className="md:col-span-3 space-y-2">
-                      <input className="w-full bg-gray-50 border border-gray-100 p-2 rounded text-sm font-bold" placeholder="Název výsledku" value={res.title} onChange={(e) => { const n = [...results]; n[idx].title = e.target.value; setResults(n); }} />
-                      <textarea className="w-full bg-gray-50 border border-gray-100 p-2 rounded text-xs" placeholder="Vzkaz..." value={res.text} onChange={(e) => { const n = [...results]; n[idx].text = e.target.value; setResults(n); }} />
-                    </div>
-                  </div>
-                ))}
-                <button onClick={() => setResults([...results, { min: 0, max: 100, title: '', text: '' }])} className="text-[10px] font-black uppercase text-gray-400 hover:text-black">+ Přidat rozsah</button>
-              </div>
-            </div>
           </div>
         ) : (
           <div className="max-w-2xl mx-auto border border-gray-100 p-4 rounded-3xl shadow-sm">
