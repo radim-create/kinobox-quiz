@@ -43,7 +43,7 @@ const QuizPlayer = ({ quizData }) => {
     const res = getFinalResult();
     return (
       <div className="p-8 text-center bg-white rounded-3xl animate-in fade-in duration-500 max-w-xl mx-auto border border-gray-100 shadow-sm">
-        <h2 className="text-4xl font-black mb-2 italic uppercase tracking-tighter text-black">HOTOVO!</h2>
+        <h2 className="text-4xl font-black mb-2 italic uppercase tracking-tighter text-black">DOKONČENO!</h2>
         <div className="inline-block bg-yellow-400 text-black font-black text-3xl px-6 py-2 rounded-2xl mb-6 shadow-sm">
           {score} / {questions.length}
         </div>
@@ -58,6 +58,36 @@ const QuizPlayer = ({ quizData }) => {
           Zkusit znovu
         </button>
 
+        {/* --- PŘEHLED OTÁZEK A ODPOVĚDÍ --- */}
+        <div className="mt-12 text-left space-y-4 max-w-md mx-auto">
+          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 border-b pb-2">
+            Přehled tvých odpovědí:
+          </h4>
+          {questions.map((q, idx) => {
+            const isUserCorrect = answersHistory[idx];
+            const correctAnswer = q.answers.find(a => a.isCorrect)?.text;
+            
+            return (
+              <div key={idx} className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <p className="font-bold text-sm text-slate-800 mb-2 leading-tight">
+                  {idx + 1}. {q.text}
+                </p>
+                <div className="flex items-start gap-2">
+                  <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${isUserCorrect ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Správná odpověď: <span className="font-bold text-slate-900">{correctAnswer}</span>
+                    <br />
+                    <span className={`font-black uppercase text-[9px] tracking-widest ${isUserCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                      {isUserCorrect ? '✓ Správně' : '✗ Chyba'}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* --- BANNER KINOBOX --- */}
         <div className="mt-12 pt-8 border-t border-gray-100">
             <h2 className="text-lg font-black text-slate-900 mb-6 leading-tight max-w-xs mx-auto">
               Přidejte se k milovníkům filmů a stáhněte si naši aplikaci
@@ -132,7 +162,6 @@ const QuizPlayer = ({ quizData }) => {
             <button
               key={idx}
               type="button"
-              // OPRAVA: onPointerUp zareaguje až při zvednutí prstu, což nevadí scrollu
               onPointerUp={(e) => {
                 e.preventDefault();
                 handleAnswer(ans.isCorrect);
