@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import ImageUploader from './ImageUploader';
 import QuizPlayer from './QuizPlayer';
-import { PlusCircle, Trash2, CheckCircle2, Smartphone } from 'lucide-react';
+// PŘIDÁNY HVĚZDY PRO HODNOCENÍ, ODEBRÁN SMARTPHONE
+import { PlusCircle, Trash2, CheckCircle2, Star, StarHalf } from 'lucide-react';
 
 function App() {
   const [view, setView] = useState('list');
@@ -51,45 +52,49 @@ function App() {
     else { alert('Uloženo!'); setView('list'); loadQuizzes(); }
   };
 
-  // --- TATO ČÁST BYLA UPRAVENA (PLAY VIEW + APP BANNER) ---
+  // --- TATO SEKCE JE KOMPLETNĚ PŘEPRACOVÁNA PODLE NÁVRHU ---
   if (view === 'play' && publicQuiz) {
     return (
       <div className="min-h-screen bg-white p-4 flex flex-col items-center">
         <div className="w-full max-w-xl">
           <QuizPlayer quizData={publicQuiz} />
           
-          {/* Kinobox App Banner */}
-          <div className="mt-8 p-6 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col items-center text-center">
-            <div className="bg-yellow-400 p-3 rounded-2xl mb-4">
-              <Smartphone className="text-black" size={24} />
+          {/* NOVÝ Kinobox App Banner podle designu */}
+          <div className="mt-16 p-4 bg-white text-center">
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-8 leading-tight">
+              Přidejte se k milovníkům filmů a seriálů a stáhněte si naši aplikaci
+            </h2>
+
+            {/* Tlačítka obchodů */}
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8 items-center">
+              <a href="https://play.google.com/store/apps/details?id=cz.kinobox" target="_blank" rel="noreferrer">
+                {/* Používám oficiální SVG odznaky z Wikimedia CDN pro autentický vzhled */}
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Nyní na Google Play" className="h-16" />
+              </a>
+              <a href="https://apps.apple.com/cz/app/kinobox/id1501170940" target="_blank" rel="noreferrer">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Stáhnout v App Store" className="h-16" />
+              </a>
             </div>
-            <h4 className="font-black text-lg mb-1 uppercase italic tracking-tight text-black">Baví tě tento kvíz?</h4>
-            <p className="text-gray-500 text-sm mb-6 px-4">Stáhni si aplikaci Kinobox a hraj stovky dalších kvízů o filmech a seriálech!</p>
-            
-            <div className="flex gap-3 w-full max-w-[300px]">
-              <a 
-                href="https://apps.apple.com/cz/app/kinobox/id1501170940" 
-                target="_blank" 
-                rel="noreferrer"
-                className="flex-1 bg-black text-white py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
-              >
-                App Store
-              </a>
-              <a 
-                href="https://play.google.com/store/apps/details?id=cz.kinobox" 
-                target="_blank" 
-                rel="noreferrer"
-                className="flex-1 bg-black text-white py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
-              >
-                Google Play
-              </a>
+
+            {/* Hodnocení a stažení */}
+            <div className="flex justify-center items-center gap-3 text-slate-700 font-bold text-lg">
+              <span>100 000+ stažení</span>
+              <div className="flex text-yellow-500">
+                {/* 4 plné hvězdy a 1 poloviční */}
+                <Star size={24} fill="currentColor" />
+                <Star size={24} fill="currentColor" />
+                <Star size={24} fill="currentColor" />
+                <Star size={24} fill="currentColor" />
+                <StarHalf size={24} fill="currentColor" />
+              </div>
             </div>
           </div>
+           {/* KONEC NOVÉHO BANNERU */}
+
         </div>
       </div>
     );
   }
-  // --- KONEC ÚPRAVY ---
 
   const startNewQuiz = () => {
     setCurrentQuizId(null); setQuizTitle(''); setQuestions([]);
@@ -130,7 +135,8 @@ function App() {
                     <button 
                       onClick={() => {
                         const productionUrl = 'https://kinobox-quiz-lake.vercel.app';
-                        const embed = `<iframe src="${productionUrl}/play/${quiz.id}" style="width:100%; border:none; min-height:800px; overflow:hidden;" scrolling="no" allow="clipboard-write"></iframe>`;
+                        // Zvýšil jsem min-height, aby se tam banner pohodlně vešel
+                        const embed = `<iframe src="${productionUrl}/play/${quiz.id}" style="width:100%; border:none; min-height:900px; overflow:hidden;" scrolling="no" allow="clipboard-write"></iframe>`;
                         navigator.clipboard.writeText(embed); 
                         alert('Embed kód zkopírován!');
                       }}
