@@ -1,18 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* Fix pro bílé pozadí a iOS */
-:root {
-  background-color: #ffffff !important;
-  color-scheme: light !important;
-}
+@layer base {
+  :root {
+    background-color: #ffffff !important;
+    color-scheme: light !important;
+  }
 
-html, body, #root {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
+  html, body, #root {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
