@@ -64,10 +64,12 @@ const QuizPlayer = ({ quizData }) => {
             </h2>
 
             <div className="flex flex-row justify-center gap-3 mb-6 items-center">
-              <a href="https://play.google.com/store/apps/details?id=cz.kinobox" target="_blank" rel="noreferrer" className="active:opacity-70 transition-opacity">
+              {/* AKTUALIZOVANÝ ANDROID LINK */}
+              <a href="https://play.google.com/store/apps/details?id=cz.kinobox.kinobox" target="_blank" rel="noreferrer" className="active:opacity-70 transition-opacity">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" className="h-10" />
               </a>
-              <a href="https://apps.apple.com/cz/app/kinobox/id1501170940" target="_blank" rel="noreferrer" className="active:opacity-70 transition-opacity">
+              {/* AKTUALIZOVANÝ iOS LINK */}
+              <a href="https://apps.apple.com/cz/app/kinobox-filmov%C3%A1-datab%C3%A1ze/id6464039616" target="_blank" rel="noreferrer" className="active:opacity-70 transition-opacity">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="App Store" className="h-10" />
               </a>
             </div>
@@ -132,7 +134,6 @@ const QuizPlayer = ({ quizData }) => {
             <button
               key={idx}
               type="button"
-              // KLÍČOVÁ ZMĚNA: onPointerDown místo onClick pro okamžitou reakci v aplikaci
               onPointerDown={(e) => {
                 e.preventDefault();
                 handleAnswer(ans.isCorrect);
