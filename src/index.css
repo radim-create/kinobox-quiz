@@ -1,6 +1,15 @@
-@import "tailwindcss";
-
-body {
-  @apply bg-slate-900 text-white;
+/* src/index.css */
+html, body, #root {
+  background-color: #ffffff !important;
+  color: #000000 !important;
   margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  /* Vynucení světlého režimu pro iOS */
+  color-scheme: light !important;
+}
+
+* {
+  box-sizing: border-box;
 }
