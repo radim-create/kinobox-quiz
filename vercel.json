@@ -7,7 +7,8 @@
       "source": "/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Content-Security-Policy", "value": "frame-ancestors *; default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data:; connect-src *" }
+        { "key": "Content-Security-Policy", "value": "default-src * 'unsafe-inline' 'unsafe-eval' data: gap: content:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:; connect-src *;" },
+        { "key": "X-Frame-Options", "value": "ALLOWALL" }
       ]
     }
   ]

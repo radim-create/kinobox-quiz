@@ -6,21 +6,20 @@
     <meta name="color-scheme" content="light only">
     <title>Kinobox Kvíz</title>
     <style>
-      body, #root { background: white !important; color: black !important; margin: 0; padding: 0; }
-      #emergency-msg { color: red; text-align: center; padding: 20px; font-weight: bold; font-family: sans-serif; display: none; }
+      body, #root { background: white !important; color: black !important; margin: 0; }
+      #debug-log { position: fixed; top: 0; left: 0; width: 100%; background: rgba(255,255,255,0.9); color: red; font-size: 10px; z-index: 10000; pointer-events: none; }
     </style>
   </head>
   <body>
-    <div id="emergency-msg">CHYBA: Aplikace se nespustila</div>
+    <div id="debug-log"></div>
     <div id="root"></div>
-    
     <script>
-      // Pokud se do 5 vteřin nic nenačte, ukážeme chybu
-      setTimeout(() => {
-        if (!document.getElementById('root').innerHTML) {
-          document.getElementById('emergency-msg').style.display = 'block';
-        }
-      }, 5000);
+      // Tento skript vypíše chybu přímo do té bílé plochy v iPhonu
+      window.onerror = function(msg, url, line, col, error) {
+        var debug = document.getElementById('debug-log');
+        debug.innerHTML += 'CHYBA: ' + msg + ' (L:' + line + ')<br>';
+        return false;
+      };
     </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
