@@ -1,54 +1,78 @@
 import React, { useState } from 'react';
 import { supabase } from './supabaseClient';
-import { Image, Loader2, X } from 'lucide-react';
+import { Upload, X, ImageIcon, Loader2 } from 'lucide-react';
 
-export default function ImageUploader({ onUpload, currentImage }) {
+const ImageUploader = ({ onUpload, currentImage }) => {
   const [uploading, setUploading] = useState(false);
 
-  const handleUpload = async (e) => {
+  const handleUpload = async (event) => {
     try {
       setUploading(true);
-      const file = e.target.files[0];
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `quiz-assets/${fileName}`;
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('Musíte vybrat obrázek.');
+      }
 
-      const { error: uploadError } = await supabase.storage
-        .from('quiz-assets')
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      // Vytvoříme unikátní název souboru
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = fileName;
+
+      // 1. Nahrání do Supabase Storage (bucket: quiz-images)
+      let { error: uploadError } = await supabase.storage
+        .from('quiz-images')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage.from('quiz-assets').getPublicUrl(filePath);
+      // 2. Získání veřejné URL adresy
+      const { data } = supabase.storage
+        .from('quiz-images')
+        .getPublicUrl(filePath);
+
       onUpload(data.publicUrl);
     } catch (error) {
-      alert('Chyba při nahrávání obrázku.');
+      console.error('Error uploading image:', error.message);
+      alert('Chyba při nahrávání obrázku: ' + error.message);
     } finally {
       setUploading(false);
     }
   };
 
-  if (currentImage) return (
-    <div className="relative w-full h-32 group">
-      <img src={currentImage} className="w-full h-full object-cover rounded-xl" alt="Preview" />
-      <button 
-        onClick={() => onUpload('')}
-        className="absolute top-2 right-2 bg-red-500 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-      >
-        <X size={16} />
-      </button>
-    </div>
-  );
+  const removeImage = () => {
+    onUpload('');
+  };
 
   return (
-    <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-700 rounded-xl cursor-pointer hover:border-kinobox transition-colors">
-      {uploading ? <Loader2 className="animate-spin text-kinobox" /> : (
-        <>
-          <Image className="text-slate-500 mb-2" />
-          <span className="text-xs text-slate-500 text-center px-2 font-medium uppercase tracking-tighter">Nahrát obrázek</span>
-        </>
+    <div className="w-full">
+      {currentImage ? (
+        <div className="relative rounded-2xl overflow-hidden border border-slate-200 group bg-slate-50">
+          <img src={currentImage} alt="Preview" className="w-full h-48 object-cover" />
+          <button
+            onClick={removeImage}
+            className="absolute top-2 right-2 p-2 bg-white/90 backdrop-blur shadow-sm rounded-full text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      ) : (
+        <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-200 rounded-3xl cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all">
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            {uploading ? (
+              <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-3" />
+            ) : (
+              <ImageIcon className="w-10 h-10 text-slate-300 mb-3" />
+            )}
+            <p className="mb-2 text-sm text-slate-500 font-bold">
+              {uploading ? 'Nahrávám...' : 'Klikněte pro nahrání obrázku'}
+            </p>
+            <p className="text-xs text-slate-400 italic">PNG, JPG nebo WEBP</p>
+          </div>
+          <input type="file" className="hidden" onChange={handleUpload} disabled={uploading} accept="image/*" />
+        </label>
       )}
-      <input type="file" className="hidden" onChange={handleUpload} disabled={uploading} accept="image/*" />
-    </label>
+    </div>
   );
-}
+};
+
+export default ImageUploader;
