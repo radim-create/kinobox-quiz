@@ -1,6 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
 
 :root {
   background-color: #ffffff !important;
@@ -14,10 +16,5 @@ html, body, #root {
   padding: 0;
   width: 100%;
   height: 100%;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Pojistka pro tlačítka */
-button {
   touch-action: manipulation;
 }
