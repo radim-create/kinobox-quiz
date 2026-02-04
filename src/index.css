@@ -1,4 +1,13 @@
 /* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
 html, body, #root {
   background-color: #ffffff !important;
   color: #000000 !important;
@@ -6,10 +15,10 @@ html, body, #root {
   padding: 0;
   width: 100%;
   height: 100%;
-  /* Vynucení světlého režimu pro iOS */
   color-scheme: light !important;
 }
 
-* {
-  box-sizing: border-box;
+/* Zajištění, že texty v kvízu budou vždy vidět */
+.text-slate-900, .text-black {
+  color: #0f172a !important;
 }
