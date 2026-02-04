@@ -2,26 +2,29 @@
 <html lang="cs">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    
     <meta name="color-scheme" content="light only">
-    
     <title>Kinobox Kvíz</title>
-
     <style>
-      /* 2. Pojistka pro bílé pozadí hned při startu, aby aplikace neviděla černou plochu */
-      html, body {
-        background-color: #ffffff !important;
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
+      /* Vynucení bílého pozadí, aby iPhone neukazoval černou tmu */
+      html, body { 
+        background-color: white !important; 
+        color: black !important;
+        margin: 0; padding: 0;
       }
+      #ios-debug { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; font-size: 10px; color: red; background: white; }
     </style>
   </head>
   <body>
+    <div id="ios-debug"></div>
     <div id="root"></div>
+    
+    <script>
+      // Tento skript vypíše chybu přímo na obrazovku iPhonu, pokud React spadne
+      window.onerror = function(msg, url, line) {
+        document.getElementById('ios-debug').innerHTML = 'CHYBA: ' + msg + ' (řádek ' + line + ')';
+      };
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

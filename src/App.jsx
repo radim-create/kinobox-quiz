@@ -16,15 +16,17 @@ function App() {
   const [questions, setQuestions] = useState([]);
   const [results, setResults] = useState([{ min: 0, max: 100, title: '', text: '' }]);
 
-  useEffect(() => {
-    const path = window.location.pathname;
-    if (path.startsWith('/play/')) {
-      const id = path.split('/play/')[1];
-      fetchPublicQuiz(id);
-    } else {
-      loadQuizzes();
-    }
-  }, []);
+ useEffect(() => {
+  const path = window.location.pathname;
+  // Přidáme podporu pro /play/ i /embed/
+  if (path.includes('/play/') || path.includes('/embed/')) {
+    const parts = path.split('/');
+    const id = parts[parts.length - 1]; // Vezme poslední část URL (to ID)
+    fetchPublicQuiz(id);
+  } else {
+    loadQuizzes();
+  }
+}, []);
 
   const fetchPublicQuiz = async (id) => {
     const { data, error } = await supabase.from('quizzes').select('*').eq('id', id).single();
@@ -55,7 +57,7 @@ function App() {
   // --- ZDE BYL BANNER ODEBRÁN, ZŮSTÁVÁ JEN QUIZPLAYER ---
   if (view === 'play' && publicQuiz) {
     return (
-      <div className="min-h-screen bg-white p-4 flex flex-col items-center">
+  <div className="min-h-screen bg-white text-black font-sans selection:bg-yellow-200">
         <div className="w-full max-w-xl">
           <QuizPlayer quizData={publicQuiz} />
         </div>
