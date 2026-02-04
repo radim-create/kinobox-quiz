@@ -1,8 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* Fix pro bílé pozadí a iOS interaktivitu */
+/* Tvůj stávající kód pro bílé pozadí nechej pod tím */
 :root {
   background-color: #ffffff !important;
   color-scheme: light !important;
