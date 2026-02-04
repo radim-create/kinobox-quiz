@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Fix pro bílé pozadí a iOS */
 :root {
   background-color: #ffffff !important;
   color-scheme: light !important;
@@ -15,17 +14,10 @@ html, body, #root {
   padding: 0;
   width: 100%;
   height: 100%;
-  touch-action: manipulation;
-}
-
-/* Oprava pro interaktivitu tlačítek */
-button {
-  cursor: pointer;
-  -webkit-appearance: none;
-  touch-action: manipulation;
-  pointer-events: auto !important;
-}
-
-* {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Pojistka pro tlačítka */
+button {
+  touch-action: manipulation;
 }

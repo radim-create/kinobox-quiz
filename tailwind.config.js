@@ -5,11 +5,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {
-      colors: {
-        kinobox: '#ffcc00',
-      }
-    },
+    extend: {},
   },
   plugins: [],
 }
