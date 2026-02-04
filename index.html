@@ -1,16 +1,27 @@
 <!doctype html>
-<html lang="cs" style="background: white !important; color: black !important;">
+<html lang="cs" style="background: white !important;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="color-scheme" content="light only">
     <title>Kinobox Kvíz</title>
     <style>
-      body, #root { background: white !important; color: black !important; }
+      body, #root { background: white !important; color: black !important; margin: 0; padding: 0; }
+      #emergency-msg { color: red; text-align: center; padding: 20px; font-weight: bold; font-family: sans-serif; display: none; }
     </style>
   </head>
-  <body style="background: white !important;">
+  <body>
+    <div id="emergency-msg">CHYBA: Aplikace se nespustila</div>
     <div id="root"></div>
+    
+    <script>
+      // Pokud se do 5 vteřin nic nenačte, ukážeme chybu
+      setTimeout(() => {
+        if (!document.getElementById('root').innerHTML) {
+          document.getElementById('emergency-msg').style.display = 'block';
+        }
+      }, 5000);
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
