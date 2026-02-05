@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Star, StarHalf } from 'lucide-react';
+import { ChevronLeft, Star, StarHalf, ExternalLink } from 'lucide-react';
 
 const QuizPlayer = ({ quizData }) => {
   const [currentStep, setCurrentStep] = useState(0); 
@@ -48,7 +48,7 @@ const QuizPlayer = ({ quizData }) => {
     return results.find(r => percent >= r.min && percent <= r.max) || results[0];
   };
 
-  // OBRAZOVKA VÝSLEDKŮ - RIGIDNÍ SCROLLER
+  // --- OBRAZOVKA VÝSLEDKŮ ---
   if (showResult) {
     const res = getFinalResult();
     return (
@@ -71,35 +71,29 @@ const QuizPlayer = ({ quizData }) => {
           <button 
             type="button"
             onPointerUp={() => window.location.reload()} 
-            className="bg-black text-white px-8 py-4 rounded-full font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer"
+            className="bg-black text-white px-8 py-4 rounded-full font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer mb-12"
           >
             Zkusit znovu
           </button>
 
-          <div className="mt-12 text-left space-y-4 max-w-md mx-auto">
-            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 border-b pb-2">
-              Přehled tvých odpovědí:
-            </h4>
-            {questions.map((q, idx) => {
-              const isUserCorrect = answersHistory[idx];
-              const correctAnswer = q.answers.find(a => a.isCorrect)?.text;
-              return (
-                <div key={idx} className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                  <p className="font-bold text-sm text-slate-800 mb-2 leading-tight">{idx + 1}. {q.text}</p>
-                  <div className="flex items-start gap-2">
-                    <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${isUserCorrect ? 'bg-green-500' : 'bg-red-500'}`} />
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      Správná odpověď: <span className="font-bold text-slate-900">{correctAnswer}</span><br />
-                      <span className={`font-black uppercase text-[9px] tracking-widest ${isUserCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                        {isUserCorrect ? '✓ Správně' : '✗ Chyba'}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+          {/* --- NOVÝ ODKAZ NA ČLÁNEK S VÝSLEDKY --- */}
+          <div className="mt-4 mb-12 p-6 bg-slate-50 rounded-[32px] border border-slate-100 group transition-all">
+            <a 
+              href="https://www.kinobox.cz/clanky/tema/50658-vysledky-filmovych-kvizu-jak-se-vam-darilo" 
+              target="_blank" 
+              rel="noreferrer"
+              className="flex flex-col items-center gap-2 no-underline"
+            >
+              <h4 className="text-xl font-black italic uppercase tracking-tight text-blue-600 group-hover:text-blue-700 transition-colors">
+                Správné odpovědi kvízu
+              </h4>
+              <p className="text-sm text-slate-400 font-bold flex items-center gap-1">
+                KLIKNI PRO ZOBRAZENÍ <ExternalLink size={14} />
+              </p>
+            </a>
           </div>
 
+          {/* --- BANNER KINOBOX --- */}
           <div className="mt-12 pt-8 border-t border-gray-100 pb-20">
               <h2 className="text-lg font-black text-slate-900 mb-6 leading-tight max-w-xs mx-auto">
                 Přidejte se k milovníkům filmů a stáhněte si naši aplikaci
@@ -124,7 +118,7 @@ const QuizPlayer = ({ quizData }) => {
     );
   }
 
-  // OBRAZOVKA OTÁZEK
+  // --- OBRAZOVKA OTÁZEK ---
   const q = questions[currentStep];
   if (!q) return <div className="p-10 text-center text-black font-bold italic uppercase tracking-tighter">Načítání...</div>;
 
