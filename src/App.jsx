@@ -101,12 +101,11 @@ function App() {
   if (view === 'play' && publicQuiz) {
     return (
       <div style={{ 
-        position: 'fixed', 
-        inset: 0, 
         height: '750px', 
         width: '100%', 
         overflow: 'hidden', 
-        backgroundColor: 'white' 
+        position: 'relative',
+        backgroundColor: 'white'
       }}>
         <QuizPlayer quizData={publicQuiz} />
       </div>

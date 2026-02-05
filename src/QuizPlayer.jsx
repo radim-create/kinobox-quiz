@@ -48,19 +48,19 @@ const QuizPlayer = ({ quizData }) => {
     return results.find(r => percent >= r.min && percent <= r.max) || results[0];
   };
 
+  // OBRAZOVKA VÝSLEDKŮ - RIGIDNÍ SCROLLER
   if (showResult) {
     const res = getFinalResult();
     return (
-      /* FINÁLNÍ FIX: scroll probíhá v tomto absolutním divu o výšce 100% (750px) */
       <div 
-        className="absolute inset-0 bg-white overflow-y-scroll"
+        className="flex flex-col h-full w-full bg-white overflow-y-auto"
         style={{ 
-          WebkitOverflowScrolling: 'touch', 
-          height: '100%',
-          zIndex: 9999
+          height: '750px',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain'
         }}
       >
-        <div className="p-8 text-center max-w-xl mx-auto pb-24">
+        <div className="p-8 text-center max-w-xl mx-auto w-full">
           <h2 className="text-4xl font-black mb-2 italic uppercase tracking-tighter text-black">DOKONČENO!</h2>
           <div className="inline-block bg-yellow-400 text-black font-black text-3xl px-6 py-2 rounded-2xl mb-6 shadow-sm">
             {score} / {questions.length}
@@ -71,12 +71,12 @@ const QuizPlayer = ({ quizData }) => {
           <button 
             type="button"
             onPointerUp={() => window.location.reload()} 
-            className="bg-black text-white px-8 py-4 rounded-full font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer mb-12"
+            className="bg-black text-white px-8 py-4 rounded-full font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer"
           >
             Zkusit znovu
           </button>
 
-          <div className="text-left space-y-4 max-w-md mx-auto">
+          <div className="mt-12 text-left space-y-4 max-w-md mx-auto">
             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 border-b pb-2">
               Přehled tvých odpovědí:
             </h4>
@@ -100,7 +100,7 @@ const QuizPlayer = ({ quizData }) => {
             })}
           </div>
 
-          <div className="mt-12 pt-8 border-t border-gray-100">
+          <div className="mt-12 pt-8 border-t border-gray-100 pb-20">
               <h2 className="text-lg font-black text-slate-900 mb-6 leading-tight max-w-xs mx-auto">
                 Přidejte se k milovníkům filmů a stáhněte si naši aplikaci
               </h2>
@@ -124,56 +124,59 @@ const QuizPlayer = ({ quizData }) => {
     );
   }
 
+  // OBRAZOVKA OTÁZEK
   const q = questions[currentStep];
-  if (!q) return <div className="p-10 text-center text-black font-bold">Načítání...</div>;
+  if (!q) return <div className="p-10 text-center text-black font-bold italic uppercase tracking-tighter">Načítání...</div>;
 
   return (
-    <div className="h-full w-full bg-white flex flex-col">
-      <div className="bg-gray-100 h-2 w-full">
+    <div className="flex flex-col h-full w-full bg-white overflow-hidden">
+      <div className="bg-gray-100 h-2 w-full shrink-0">
         <div 
           className="bg-blue-600 h-full transition-all duration-700 ease-out" 
           style={{ width: `${((currentStep + 1) / questions.length) * 100}%` }}
         />
       </div>
 
-      <div className="p-6 overflow-y-auto flex-1">
-        <div className="flex justify-between items-center mb-8">
-          {currentStep > 0 ? (
-            <button 
-              type="button"
-              onPointerUp={handleBack}
-              className="flex items-center gap-1 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-black transition-colors"
-            >
-              <ChevronLeft size={14} /> Zpět
-            </button>
-          ) : <div />}
-          <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-            Otázka {currentStep + 1} z {questions.length}
-          </span>
-        </div>
-
-        <h2 className="text-2xl md:text-3xl font-bold mb-8 leading-tight text-slate-900">{q.text}</h2>
-
-        {q.image && (
-          <div className="mb-6 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50">
-            <img src={q.image} alt="Otázka" className="w-full h-44 object-cover" />
+      <div className="flex-1 overflow-y-auto p-6 scroll-smooth" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="max-w-xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            {currentStep > 0 ? (
+              <button 
+                type="button"
+                onPointerUp={handleBack}
+                className="flex items-center gap-1 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-black transition-colors"
+              >
+                <ChevronLeft size={14} /> Zpět
+              </button>
+            ) : <div />}
+            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+              Otázka {currentStep + 1} z {questions.length}
+            </span>
           </div>
-        )}
 
-        <div className={`grid grid-cols-1 gap-3 pb-8 ${isProcessing ? 'pointer-events-none opacity-50' : ''}`}>
-          {q.answers.map((ans, idx) => (
-            <button
-              key={`${currentStep}-${idx}`}
-              type="button"
-              onPointerUp={(e) => { e.preventDefault(); handleAnswer(ans.isCorrect); }}
-              className="group flex items-center p-5 bg-gray-50 border-2 border-gray-100 rounded-2xl text-left hover:border-blue-500 active:scale-[0.98] transition-all"
-            >
-              <span className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center font-bold text-xs mr-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                {String.fromCharCode(65 + idx)}
-              </span>
-              <span className="font-bold text-slate-700 group-hover:text-blue-900 pointer-events-none">{ans.text}</span>
-            </button>
-          ))}
+          <h2 className="text-2xl md:text-3xl font-bold mb-8 leading-tight text-slate-900">{q.text}</h2>
+
+          {q.image && (
+            <div className="mb-6 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50">
+              <img src={q.image} alt="Otázka" className="w-full h-44 object-cover" />
+            </div>
+          )}
+
+          <div className={`grid grid-cols-1 gap-3 pb-10 ${isProcessing ? 'pointer-events-none opacity-50' : ''}`}>
+            {q.answers.map((ans, idx) => (
+              <button
+                key={`${currentStep}-${idx}`}
+                type="button"
+                onPointerUp={(e) => { e.preventDefault(); handleAnswer(ans.isCorrect); }}
+                className="group flex items-center p-5 bg-gray-50 border-2 border-gray-100 rounded-2xl text-left hover:border-blue-500 active:scale-[0.98] transition-all"
+              >
+                <span className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center font-bold text-xs mr-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                  {String.fromCharCode(65 + idx)}
+                </span>
+                <span className="font-bold text-slate-700 group-hover:text-blue-900 pointer-events-none">{ans.text}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
