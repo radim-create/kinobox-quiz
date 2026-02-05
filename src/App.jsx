@@ -100,7 +100,8 @@ function App() {
   // --- ZDE JE PŘIDÁNA POJISTKA PRO SCROLLOVÁNÍ ---
   if (view === 'play' && publicQuiz) {
     return (
-      <div className="h-screen bg-white relative overflow-hidden">
+      /* Pevná výška 750px + overflow hidden zajistí, že iOS nezačne natahovat iFrame */
+      <div style={{ height: '750px', width: '100vw', overflow: 'hidden', position: 'relative', backgroundColor: 'white' }}>
         <QuizPlayer quizData={publicQuiz} />
       </div>
     );
