@@ -48,6 +48,7 @@ const QuizPlayer = ({ quizData }) => {
     return results.find(r => percent >= r.min && percent <= r.max) || results[0];
   };
 
+  // --- OBRAZOVKA VÝSLEDKŮ ---
   if (showResult) {
     const res = getFinalResult();
     return (
@@ -56,7 +57,7 @@ const QuizPlayer = ({ quizData }) => {
         style={{ 
           height: '750px', 
           overflowY: 'auto', 
-          WebkitOverflowScrolling: 'touch', /* Momentum scroll pro iOS */
+          WebkitOverflowScrolling: 'touch',
           paddingBottom: '100px'
         }}
       >
@@ -76,7 +77,7 @@ const QuizPlayer = ({ quizData }) => {
             Zkusit znovu
           </button>
 
-          {/* --- PŘEHLED OTÁZEK --- */}
+          {/* Přehled otázek */}
           <div className="mt-12 text-left space-y-4 max-w-md mx-auto">
             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 border-b pb-2">
               Přehled tvých odpovědí:
@@ -101,7 +102,7 @@ const QuizPlayer = ({ quizData }) => {
             })}
           </div>
 
-          {/* --- BANNER KINOBOX --- */}
+          {/* Banner aplikace */}
           <div className="mt-12 pt-8 border-t border-gray-100 pb-12">
               <h2 className="text-lg font-black text-slate-900 mb-6 leading-tight max-w-xs mx-auto">
                 Přidejte se k milovníkům filmů a stáhněte si naši aplikaci
@@ -124,40 +125,9 @@ const QuizPlayer = ({ quizData }) => {
         </div>
       </div>
     );
-            })}
-          </div>
-
-          {/* --- BANNER KINOBOX --- */}
-          <div className="mt-12 pt-8 border-t border-gray-100">
-              <h2 className="text-lg font-black text-slate-900 mb-6 leading-tight max-w-xs mx-auto">
-                Přidejte se k milovníkům filmů a stáhněte si naši aplikaci
-              </h2>
-
-              <div className="flex flex-row justify-center gap-3 mb-6 items-center">
-                <a href="https://play.google.com/store/apps/details?id=cz.kinobox.kinobox" target="_blank" rel="noreferrer" className="active:opacity-70 transition-opacity">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" className="h-10" />
-                </a>
-                <a href="https://apps.apple.com/cz/app/kinobox-filmov%C3%A1-datab%C3%A1ze/id6464039616" target="_blank" rel="noreferrer" className="active:opacity-70 transition-opacity">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="App Store" className="h-10" />
-                </a>
-              </div>
-
-              <div className="flex justify-center items-center gap-2 text-slate-500 font-bold text-[12px]">
-                <span>100 000+ stažení</span>
-                <div className="flex text-yellow-500">
-                  <Star size={14} fill="currentColor" />
-                  <Star size={14} fill="currentColor" />
-                  <Star size={14} fill="currentColor" />
-                  <Star size={14} fill="currentColor" />
-                  <StarHalf size={14} fill="currentColor" />
-                </div>
-              </div>
-          </div>
-        </div>
-      </div>
-    );
   }
 
+  // --- OBRAZOVKA OTÁZEK ---
   const q = questions[currentStep];
   if (!q) return <div className="p-10 text-center text-black font-bold">Načítání otázek...</div>;
 
