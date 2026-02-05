@@ -51,6 +51,8 @@ const QuizPlayer = ({ quizData }) => {
   // --- OBRAZOVKA VÝSLEDKŮ ---
   if (showResult) {
     const res = getFinalResult();
+    const resultsUrl = "https://www.kinobox.cz/clanky/tema/50658-vysledky-filmovych-kvizu-jak-se-vam-darilo";
+
     return (
       <div 
         className="flex flex-col h-full w-full bg-white overflow-y-auto"
@@ -76,21 +78,22 @@ const QuizPlayer = ({ quizData }) => {
             Zkusit znovu
           </button>
 
-          {/* --- NOVÝ ODKAZ NA ČLÁNEK S VÝSLEDKY --- */}
-          <div className="mt-4 mb-12 p-6 bg-slate-50 rounded-[32px] border border-slate-100 group transition-all">
-            <a 
-              href="https://www.kinobox.cz/clanky/tema/50658-vysledky-filmovych-kvizu-jak-se-vam-darilo" 
-              target="_blank" 
-              rel="noreferrer"
-              className="flex flex-col items-center gap-2 no-underline"
-            >
+          {/* --- OPRAVENÝ ODKAZ PRO IPHONE --- */}
+          <div 
+            onPointerUp={(e) => {
+              e.preventDefault();
+              window.open(resultsUrl, '_blank');
+            }}
+            className="mt-4 mb-12 p-6 bg-slate-50 rounded-[32px] border border-slate-100 group transition-all cursor-pointer active:bg-slate-100 active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center gap-2">
               <h4 className="text-xl font-black italic uppercase tracking-tight text-blue-600 group-hover:text-blue-700 transition-colors">
                 Správné odpovědi kvízu
               </h4>
               <p className="text-sm text-slate-400 font-bold flex items-center gap-1">
                 KLIKNI PRO ZOBRAZENÍ <ExternalLink size={14} />
               </p>
-            </a>
+            </div>
           </div>
 
           {/* --- BANNER KINOBOX --- */}
