@@ -6,24 +6,35 @@ const QuizPlayer = ({ quizData }) => {
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [answersHistory, setAnswersHistory] = useState([]);
+  // ZÁMEK PROTI DUPLIKOVANÝM KLIKŮM
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const questions = quizData.questions || [];
   const results = quizData.results || [];
 
   const handleAnswer = (isCorrect) => {
+    if (isProcessing) return; // Pokud už zpracováváme, nic nedělej
+    setIsProcessing(true);
+
     setAnswersHistory([...answersHistory, isCorrect]);
     if (isCorrect) setScore(score + 1);
 
     const nextStep = currentStep + 1;
-    if (nextStep < questions.length) {
-      setCurrentStep(nextStep);
-    } else {
-      setShowResult(true);
-    }
+    
+    // Krátká prodleva, aby uživatel stihl zvednout prst (řeší Android ghost clicks)
+    setTimeout(() => {
+      if (nextStep < questions.length) {
+        setCurrentStep(nextStep);
+        setIsProcessing(false); // Odemkneme pro další otázku
+      } else {
+        setShowResult(true);
+        setIsProcessing(false);
+      }
+    }, 350); 
   };
 
   const handleBack = () => {
-    if (currentStep > 0) {
+    if (currentStep > 0 && !isProcessing) {
       const lastAnswerWasCorrect = answersHistory[answersHistory.length - 1];
       if (lastAnswerWasCorrect) setScore(score - 1);
       
@@ -42,7 +53,6 @@ const QuizPlayer = ({ quizData }) => {
   if (showResult) {
     const res = getFinalResult();
     return (
-      /* OPRAVA: Přidáno max-h-[740px] a overflow-y-auto pro scrollování výsledků v iFramu */
       <div className="p-8 text-center bg-white rounded-3xl animate-in fade-in duration-500 max-w-xl mx-auto border border-gray-100 shadow-sm max-h-[740px] overflow-y-auto">
         <h2 className="text-4xl font-black mb-2 italic uppercase tracking-tighter text-black">DOKONČENO!</h2>
         <div className="inline-block bg-yellow-400 text-black font-black text-3xl px-6 py-2 rounded-2xl mb-6 shadow-sm">
@@ -59,7 +69,6 @@ const QuizPlayer = ({ quizData }) => {
           Zkusit znovu
         </button>
 
-        {/* --- PŘEHLED OTÁZEK A ODPOVĚDÍ --- */}
         <div className="mt-12 text-left space-y-4 max-w-md mx-auto">
           <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 border-b pb-2">
             Přehled tvých odpovědí:
@@ -88,7 +97,6 @@ const QuizPlayer = ({ quizData }) => {
           })}
         </div>
 
-        {/* --- BANNER KINOBOX --- */}
         <div className="mt-12 pt-8 border-t border-gray-100">
             <h2 className="text-lg font-black text-slate-900 mb-6 leading-tight max-w-xs mx-auto">
               Přidejte se k milovníkům filmů a stáhněte si naši aplikaci
@@ -158,10 +166,10 @@ const QuizPlayer = ({ quizData }) => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-3 relative z-10">
+        <div className={`grid grid-cols-1 gap-3 relative z-10 ${isProcessing ? 'pointer-events-none' : ''}`}>
           {q.answers.map((ans, idx) => (
             <button
-              key={idx}
+              key={`${currentStep}-${idx}`} // UNIKÁTNÍ KLÍČ PRO KAŽDOU OTÁZKU
               type="button"
               onPointerUp={(e) => {
                 e.preventDefault();
