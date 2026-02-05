@@ -11,7 +11,6 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [publicQuiz, setPublicQuiz] = useState(null);
   
-  // Stavy pro login
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState(null);
@@ -22,7 +21,6 @@ function App() {
   const [results, setResults] = useState([{ min: 0, max: 100, title: '', text: '' }]);
 
   useEffect(() => {
-    // Kontrola přihlášení
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
@@ -81,7 +79,6 @@ function App() {
     setLoading(false);
   };
 
-  // Helper funkce pro editor (beze změny)
   const addQuestion = () => setQuestions([...questions, { text: '', image: '', answers: [{ text: '', isCorrect: false }] }]);
   const updateQuestion = (index, field, value) => { const newQs = [...questions]; newQs[index][field] = value; setQuestions(newQs); };
   const removeQuestion = (index) => setQuestions(questions.filter((_, i) => i !== index));
@@ -97,22 +94,15 @@ function App() {
   const updateResult = (index, field, value) => { const newResults = [...results]; newResults[index][field] = (field === 'min' || field === 'max') ? parseInt(value) || 0 : value; setResults(newResults); };
   const removeResult = (index) => setResults(results.filter((_, i) => i !== index));
 
-  // --- ZDE JE PŘIDÁNA POJISTKA PRO SCROLLOVÁNÍ ---
+  // OPRAVA: Pevná výška jen pro hrací režim, editoru necháme volnost
   if (view === 'play' && publicQuiz) {
     return (
-      <div style={{ 
-        height: '750px', 
-        width: '100%', 
-        overflow: 'hidden', 
-        position: 'relative',
-        backgroundColor: 'white'
-      }}>
+      <div style={{ height: '750px', width: '100%', overflow: 'hidden', position: 'relative', backgroundColor: 'white' }}>
         <QuizPlayer quizData={publicQuiz} />
       </div>
     );
   }
 
-  // PŘIHLAŠOVACÍ OBRAZOVKA (Pokud není session)
   if (!session) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
@@ -122,21 +112,11 @@ function App() {
           </div>
           <h2 className="text-3xl font-black text-center mb-2 tracking-tighter uppercase italic">Admin Vstup</h2>
           <p className="text-center text-slate-400 text-sm mb-8 font-bold uppercase tracking-widest">Kinobox Quiz Builder</p>
-          
           <form onSubmit={handleLogin} className="space-y-4">
-            <input 
-              type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)}
-              className="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold focus:ring-2 focus:ring-blue-100 transition-all"
-            />
-            <input 
-              type="password" placeholder="Heslo" value={password} onChange={e => setPassword(e.target.value)}
-              className="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold focus:ring-2 focus:ring-blue-100 transition-all"
-            />
+            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold focus:ring-2 focus:ring-blue-100 transition-all" />
+            <input type="password" placeholder="Heslo" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold focus:ring-2 focus:ring-blue-100 transition-all" />
             {authError && <p className="text-red-500 text-xs font-bold text-center">{authError}</p>}
-            <button 
-              type="submit" disabled={loading}
-              className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex justify-center"
-            >
+            <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex justify-center">
               {loading ? <Loader2 className="animate-spin" /> : 'Přihlásit se'}
             </button>
           </form>
@@ -150,7 +130,6 @@ function App() {
     setResults(quiz.results || [{ min: 0, max: 100, title: '', text: '' }]); setView('editor');
   };
 
-  // BUILDER (Jen pro přihlášené)
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
       <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 p-4 shadow-sm">
@@ -164,9 +143,7 @@ function App() {
                 <Save size={18} /> {loading ? 'Ukládám...' : 'ULOŽIT'}
               </button>
             )}
-            <button onClick={handleLogout} className="bg-slate-100 text-slate-600 px-6 py-2 rounded-full text-sm font-bold hover:bg-slate-200 transition-all">
-              ODHLÁSIT
-            </button>
+            <button onClick={handleLogout} className="bg-slate-100 text-slate-600 px-6 py-2 rounded-full text-sm font-bold hover:bg-slate-200 transition-all">ODHLÁSIT</button>
           </div>
         </div>
       </nav>
@@ -176,35 +153,23 @@ function App() {
           <div>
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-3xl font-black italic uppercase tracking-tight">Moje Kvízy</h2>
-              <button onClick={() => { setCurrentQuizId(null); setQuizTitle(''); setQuestions([]); setResults([{ min: 0, max: 100, title: '', text: '' }]); setView('editor'); }} className="bg-blue-600 text-white px-5 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-blue-200 hover:scale-105 transition-all">
-                <PlusCircle size={20} /> NOVÝ KVÍZ
-              </button>
+              <button onClick={() => { setCurrentQuizId(null); setQuizTitle(''); setQuestions([]); setResults([{ min: 0, max: 100, title: '', text: '' }]); setView('editor'); }} className="bg-blue-600 text-white px-5 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-blue-200 hover:scale-105 transition-all"><PlusCircle size={20} /> NOVÝ KVÍZ</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {quizzes.map(quiz => (
                 <div key={quiz.id} className="bg-white border border-slate-100 p-5 rounded-3xl shadow-sm hover:shadow-md transition-all group">
                   <h3 className="font-bold text-lg mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-blue-600 transition-colors">{quiz.title}</h3>
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-1.5">
-                    <Play size={12} fill="currentColor" /> Spuštěno: {quiz.plays || 0}x
-                  </div>
+                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-1.5"><Play size={12} fill="currentColor" /> Spuštěno: {quiz.plays || 0}x</div>
                   <div className="flex gap-2">
                     <button onClick={() => editQuiz(quiz)} className="flex-1 bg-slate-900 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-blue-600 transition-all">Upravit</button>
-                    <button 
-                      onClick={() => { 
-                        const prodUrl = 'https://kinobox-quiz-lake.vercel.app'; 
-                        const embed = `<iframe src="${prodUrl}/embed/${quiz.id}" style="width:100%; height:750px; background-color:white;" frameborder="0" scrolling="no" loading="eager"></iframe>`; 
-                        navigator.clipboard.writeText(embed); 
-                        alert('Embed kód zkopírován!'); 
-                      }} 
-                      className="bg-slate-100 text-slate-500 px-4 py-3 rounded-xl text-xs font-bold uppercase hover:bg-slate-200 transition-all"
-                    >Embed</button>
+                    <button onClick={() => { const prodUrl = 'https://kinobox-quiz-lake.vercel.app'; const embed = `<iframe src="${prodUrl}/embed/${quiz.id}" style="width:100%; height:750px; background-color:white;" frameborder="0" scrolling="no" loading="eager"></iframe>`; navigator.clipboard.writeText(embed); alert('Embed kód zkopírován!'); }} className="bg-slate-100 text-slate-500 px-4 py-3 rounded-xl text-xs font-bold uppercase hover:bg-slate-200 transition-all">Embed</button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         ) : (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
               <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Název kvízu</label>
               <input value={quizTitle} onChange={e => setQuizTitle(e.target.value)} placeholder="Název kvízu..." className="w-full text-3xl font-bold bg-transparent border-none focus:ring-0 p-0 placeholder:text-slate-200" />
@@ -231,21 +196,13 @@ function App() {
               <button onClick={addQuestion} className="w-full py-6 border-2 border-dashed border-blue-200 rounded-3xl text-blue-600 font-black uppercase tracking-widest hover:bg-blue-50 transition-all">+ Přidat otázku</button>
             </div>
             <div className="space-y-6 pt-10 border-t border-slate-200">
-              <h3 className="text-xl font-black uppercase italic tracking-tight text-slate-400 flex items-center gap-2">
-                <Award size={20} /> Výsledná hodnocení
-              </h3>
+              <h3 className="text-xl font-black uppercase italic tracking-tight text-slate-400 flex items-center gap-2"><Award size={20} /> Výsledná hodnocení</h3>
               {results.map((res, rIdx) => (
                 <div key={rIdx} className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative space-y-4">
                   <button onClick={() => removeResult(rIdx)} className="absolute top-6 right-6 text-slate-300 hover:text-red-500 transition-colors"><Trash2 size={20} /></button>
                   <div className="flex gap-4 items-center mb-4">
-                    <div className="flex-1">
-                      <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Min %</label>
-                      <input type="number" value={res.min} onChange={e => updateResult(rIdx, 'min', e.target.value)} className="w-full bg-slate-50 border-none rounded-xl font-bold p-3" />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Max %</label>
-                      <input type="number" value={res.max} onChange={e => updateResult(rIdx, 'max', e.target.value)} className="w-full bg-slate-50 border-none rounded-xl font-bold p-3" />
-                    </div>
+                    <div className="flex-1"><label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Min %</label><input type="number" value={res.min} onChange={e => updateResult(rIdx, 'min', e.target.value)} className="w-full bg-slate-50 border-none rounded-xl font-bold p-3" /></div>
+                    <div className="flex-1"><label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Max %</label><input type="number" value={res.max} onChange={e => updateResult(rIdx, 'max', e.target.value)} className="w-full bg-slate-50 border-none rounded-xl font-bold p-3" /></div>
                   </div>
                   <input value={res.title} onChange={e => updateResult(rIdx, 'title', e.target.value)} placeholder="Název hodnocení..." className="w-full text-xl font-bold border-none focus:ring-0 p-0 placeholder:text-slate-200" />
                   <textarea value={res.text} onChange={e => updateResult(rIdx, 'text', e.target.value)} placeholder="Podrobný text hodnocení..." className="w-full text-slate-600 border-none focus:ring-0 p-0 resize-none" rows="2" />
