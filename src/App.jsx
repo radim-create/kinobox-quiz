@@ -97,9 +97,13 @@ function App() {
   const updateResult = (index, field, value) => { const newResults = [...results]; newResults[index][field] = (field === 'min' || field === 'max') ? parseInt(value) || 0 : value; setResults(newResults); };
   const removeResult = (index) => setResults(results.filter((_, i) => i !== index));
 
-  // ZOBRAZENÍ KVÍZU (Vždy veřejné)
+  // --- ZDE JE PŘIDÁNA POJISTKA PRO SCROLLOVÁNÍ ---
   if (view === 'play' && publicQuiz) {
-    return <div className="min-h-screen bg-white"><QuizPlayer quizData={publicQuiz} /></div>;
+    return (
+      <div className="h-screen bg-white relative overflow-hidden">
+        <QuizPlayer quizData={publicQuiz} />
+      </div>
+    );
   }
 
   // PŘIHLAŠOVACÍ OBRAZOVKA (Pokud není session)
@@ -199,7 +203,6 @@ function App() {
               <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Název kvízu</label>
               <input value={quizTitle} onChange={e => setQuizTitle(e.target.value)} placeholder="Název kvízu..." className="w-full text-3xl font-bold bg-transparent border-none focus:ring-0 p-0 placeholder:text-slate-200" />
             </div>
-            {/* ... zbytek editoru (Otázky a Výsledky) zůstává stejný jako minule ... */}
             <div className="space-y-6">
               <h3 className="text-xl font-black uppercase italic tracking-tight text-slate-400">Otázky</h3>
               {questions.map((q, qIdx) => (
