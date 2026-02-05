@@ -6,14 +6,13 @@ const QuizPlayer = ({ quizData }) => {
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [answersHistory, setAnswersHistory] = useState([]);
-  // ZÁMEK PROTI DUPLIKOVANÝM KLIKŮM
   const [isProcessing, setIsProcessing] = useState(false);
 
   const questions = quizData.questions || [];
   const results = quizData.results || [];
 
   const handleAnswer = (isCorrect) => {
-    if (isProcessing) return; // Pokud už zpracováváme, nic nedělej
+    if (isProcessing) return;
     setIsProcessing(true);
 
     setAnswersHistory([...answersHistory, isCorrect]);
@@ -21,11 +20,10 @@ const QuizPlayer = ({ quizData }) => {
 
     const nextStep = currentStep + 1;
     
-    // Krátká prodleva, aby uživatel stihl zvednout prst (řeší Android ghost clicks)
     setTimeout(() => {
       if (nextStep < questions.length) {
         setCurrentStep(nextStep);
-        setIsProcessing(false); // Odemkneme pro další otázku
+        setIsProcessing(false);
       } else {
         setShowResult(true);
         setIsProcessing(false);
@@ -53,7 +51,20 @@ const QuizPlayer = ({ quizData }) => {
   if (showResult) {
     const res = getFinalResult();
     return (
-      <div className="p-8 text-center bg-white rounded-3xl animate-in fade-in duration-500 max-w-xl mx-auto border border-gray-100 shadow-sm max-h-[740px] overflow-y-auto">
+      /* FIX PRO NATIVNÍ APPLIKACE: 
+         - overscroll-behavior-contain: zabrání posunu celé aplikace při scrollování v iFramu
+         - touch-pan-y: explicitně povolí vertikální pohyb prstem
+         - -webkit-overflow-scrolling: zajistí plynulý "momentum" scroll na iOS
+      */
+      <div 
+        className="p-8 text-center bg-white rounded-3xl animate-in fade-in duration-500 max-w-xl mx-auto border border-gray-100 shadow-sm overflow-y-auto overscroll-contain touch-pan-y"
+        style={{ 
+          maxHeight: '745px', 
+          WebkitOverflowScrolling: 'touch',
+          position: 'relative',
+          zIndex: 1
+        }}
+      >
         <h2 className="text-4xl font-black mb-2 italic uppercase tracking-tighter text-black">DOKONČENO!</h2>
         <div className="inline-block bg-yellow-400 text-black font-black text-3xl px-6 py-2 rounded-2xl mb-6 shadow-sm">
           {score} / {questions.length}
@@ -169,7 +180,7 @@ const QuizPlayer = ({ quizData }) => {
         <div className={`grid grid-cols-1 gap-3 relative z-10 ${isProcessing ? 'pointer-events-none' : ''}`}>
           {q.answers.map((ans, idx) => (
             <button
-              key={`${currentStep}-${idx}`} // UNIKÁTNÍ KLÍČ PRO KAŽDOU OTÁZKU
+              key={`${currentStep}-${idx}`}
               type="button"
               onPointerUp={(e) => {
                 e.preventDefault();
