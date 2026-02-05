@@ -5,15 +5,14 @@
   color-scheme: light !important;
 }
 
-/* Zabráníme posunu celého iFramu, aby mohl scrollovat jen vnitřek */
 html, body {
-  background-color: #ffffff !important;
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden; /* Důležité: Tělo webu se nesmí hýbat */
-  -webkit-tap-highlight-color: transparent;
+  overflow: hidden; /* Zámek pozadí */
+  position: fixed; /* Fixace pro iOS */
+  background-color: #ffffff !important;
 }
 
 #root {
