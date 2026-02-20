@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, Star, StarHalf, ExternalLink } from 'lucide-react';
 
 const QuizPlayer = ({ quizData }) => {
@@ -7,6 +7,38 @@ const QuizPlayer = ({ quizData }) => {
   const [showResult, setShowResult] = useState(false);
   const [answersHistory, setAnswersHistory] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const containerRef = useRef(null);
+
+  // Dynamická výška iframe - posílá zprávu rodičovskému oknu
+  useEffect(() => {
+    const sendHeight = () => {
+      if (containerRef.current) {
+        const height = containerRef.current.scrollHeight;
+        window.parent.postMessage({ type: 'quiz-resize', height }, '*');
+      }
+    };
+
+    // Sledujeme změny velikosti obsahu
+    const observer = new ResizeObserver(sendHeight);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    // Posíláme i při načtení obrázků
+    const images = containerRef.current?.querySelectorAll('img') || [];
+    images.forEach(img => {
+      if (!img.complete) {
+        img.addEventListener('load', sendHeight);
+      }
+    });
+
+    sendHeight();
+
+    return () => {
+      observer.disconnect();
+      images.forEach(img => img.removeEventListener('load', sendHeight));
+    };
+  }, [currentStep, showResult]);
 
   const questions = quizData.questions || [];
   const results = quizData.results || [];
@@ -55,9 +87,10 @@ const QuizPlayer = ({ quizData }) => {
 
     return (
       <div 
-        className="flex flex-col h-full w-full bg-white overflow-y-auto"
+        ref={containerRef}
+        className="flex flex-col w-full bg-white overflow-y-auto"
         style={{ 
-          height: '750px',
+          minHeight: '750px',
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain'
         }}
@@ -126,7 +159,7 @@ const QuizPlayer = ({ quizData }) => {
   if (!q) return <div className="p-10 text-center text-black font-bold italic uppercase tracking-tighter">Načítání...</div>;
 
   return (
-    <div className="flex flex-col h-full w-full bg-white overflow-hidden">
+    <div ref={containerRef} className="flex flex-col h-full w-full bg-white overflow-hidden">
       <div className="bg-gray-100 h-2 w-full shrink-0">
         <div 
           className="bg-blue-600 h-full transition-all duration-700 ease-out" 
@@ -155,7 +188,7 @@ const QuizPlayer = ({ quizData }) => {
 
           {q.image && (
             <div className="mb-6 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-gray-50">
-              <img src={q.image} alt="Otázka" className="w-full h-44 object-cover" />
+              <img src={q.image} alt="Otázka" className="w-full max-h-[400px] object-contain" />
             </div>
           )}
 

@@ -97,7 +97,7 @@ function App() {
   // OPRAVA: Pevná výška jen pro hrací režim, editoru necháme volnost
   if (view === 'play' && publicQuiz) {
     return (
-      <div style={{ height: '750px', width: '100%', overflow: 'hidden', position: 'relative', backgroundColor: 'white' }}>
+      <div style={{ minHeight: '750px', width: '100%', position: 'relative', backgroundColor: 'white' }}>
         <QuizPlayer quizData={publicQuiz} />
       </div>
     );
@@ -162,7 +162,7 @@ function App() {
                   <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-1.5"><Play size={12} fill="currentColor" /> Spuštěno: {quiz.plays || 0}x</div>
                   <div className="flex gap-2">
                     <button onClick={() => editQuiz(quiz)} className="flex-1 bg-slate-900 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-blue-600 transition-all">Upravit</button>
-                    <button onClick={() => { const prodUrl = 'https://kinobox-quiz-lake.vercel.app'; const embed = `<iframe src="${prodUrl}/embed/${quiz.id}" style="width:100%; height:750px; background-color:white;" frameborder="0" scrolling="no" loading="eager"></iframe>`; navigator.clipboard.writeText(embed); alert('Embed kód zkopírován!'); }} className="bg-slate-100 text-slate-500 px-4 py-3 rounded-xl text-xs font-bold uppercase hover:bg-slate-200 transition-all">Embed</button>
+                    <button onClick={() => { const prodUrl = 'https://kinobox-quiz-lake.vercel.app'; const embed = `<iframe id="quiz-${quiz.id}" src="${prodUrl}/embed/${quiz.id}" style="width:100%; min-height:750px; background-color:white; border:none;" frameborder="0" scrolling="no" loading="eager"></iframe><script>window.addEventListener('message',function(e){if(e.data&&e.data.type==='quiz-resize'){document.getElementById('quiz-${quiz.id}').style.height=e.data.height+'px'}});<\/script>`; navigator.clipboard.writeText(embed); alert('Embed kód zkopírován!'); }} className="bg-slate-100 text-slate-500 px-4 py-3 rounded-xl text-xs font-bold uppercase hover:bg-slate-200 transition-all">Embed</button>
                   </div>
                 </div>
               ))}
