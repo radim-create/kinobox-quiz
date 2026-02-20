@@ -9,7 +9,7 @@ const QuizPlayer = ({ quizData }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const containerRef = useRef(null);
 
-  // Dynamická výška iframe - posílá zprávu rodičovskému oknu
+  // Dynamická výška iframe
   useEffect(() => {
     const sendHeight = () => {
       if (containerRef.current) {
@@ -18,13 +18,11 @@ const QuizPlayer = ({ quizData }) => {
       }
     };
 
-    // Sledujeme změny velikosti obsahu
     const observer = new ResizeObserver(sendHeight);
     if (containerRef.current) {
       observer.observe(containerRef.current);
     }
 
-    // Posíláme i při načtení obrázků
     const images = containerRef.current?.querySelectorAll('img') || [];
     images.forEach(img => {
       if (!img.complete) {
@@ -77,7 +75,12 @@ const QuizPlayer = ({ quizData }) => {
 
   const getFinalResult = () => {
     const percent = questions.length > 0 ? (score / questions.length) * 100 : 0;
-    return results.find(r => percent >= r.min && percent <= r.max) || results[0];
+    // Přesná shoda s rozmezím
+    const exact = results.find(r => percent >= r.min && percent <= r.max);
+    if (exact) return exact;
+    // Fallback: seřadíme sestupně podle min a vezmeme první, kde procenta >= min
+    const sorted = [...results].sort((a, b) => b.min - a.min);
+    return sorted.find(r => percent >= r.min) || results[results.length - 1] || results[0];
   };
 
   // --- OBRAZOVKA VÝSLEDKŮ ---
